@@ -50,9 +50,12 @@ extension BankManagerApp {
     
     private func startBank() {
         let clientDispatcher = ClientManager()
-        let bankers = [
-            Banker.init(name: "1", dispatcher: clientDispatcher),
-        ]
+        let bankers = Array<Int>(1...1000)
+            .map { Banker.init(name: "\($0)", dispatcher: clientDispatcher) }
+        
+//        [
+//            Banker.init(name: "1", dispatcher: clientDispatcher),
+//        ]
         BankManager(bankers: bankers, clientDispatcher: clientDispatcher).start()
     }
     
