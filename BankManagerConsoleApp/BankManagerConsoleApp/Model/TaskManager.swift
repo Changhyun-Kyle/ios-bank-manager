@@ -14,6 +14,8 @@ final class TaskManager {
     
     private let semaphore: DispatchSemaphore = .init(value: 1)
     
+    weak var delegate: TaskManagerDequeueDelegate?
+    
     init(
         clientQueue: Queue<Client> = .init(),
         bankerQueue: Queue<ClientTaskHandlable> = .init()
@@ -35,7 +37,8 @@ extension TaskManager: TaskManagable {
                 else {
                     continue
                 }
-                
+                // 시작했어!
+                self.delegate?.handleDequeue(client: client)
                 banker.handle(client: client, group: group)
                 
                 guard
@@ -69,4 +72,8 @@ extension TaskManager {
         self.semaphore.signal()
         return result
     }
+}
+
+protocol TaskManagerDequeueDelegate: AnyObject {
+    func handleDequeue(client: Client)
 }
