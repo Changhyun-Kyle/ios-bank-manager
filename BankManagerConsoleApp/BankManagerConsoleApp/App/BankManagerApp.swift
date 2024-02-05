@@ -10,11 +10,14 @@ final class BankManagerApp {
     
     private let output: TextOutputDisplayable
     
+    private let mirror: BankMirror
+    
     private var isRunning: Bool = true
     
     init(inputHandler: TextInputReadable, outputHandler: TextOutputDisplayable) {
         self.input = inputHandler
         self.output = outputHandler
+        self.mirror = BankMirror()
     }
     
     func start() {
@@ -36,6 +39,19 @@ private extension BankManagerApp {
         }
     }
     
+    func handle(menu: BankManagerAppMenu) {
+        switch menu {
+        case .open:
+            do {
+                try startBank()
+            } catch {
+                handle(error: error)
+            }
+        case .end:
+            self.isRunning = false
+        }
+    }
+    
     func startBank() throws {
         guard let clientCount = (10...30).randomElement() else { throw BankManagerAppError.outOfIndex }
         let dispenser = try TicketDispenser(totalClientCount: clientCount)
@@ -45,29 +61,29 @@ private extension BankManagerApp {
             Order(taskType: .deposit, bankerCount: 2),
         ]
         
-        let bankManager = BankManager(
-            textOut: self.output,
-            dispenser: dispenser
-        )
+//        let bankManager = BankManager(
+//            textOut: self.output,
+//            dispenser: dispenser
+//        )
+//        
+//        bankManager.runBank(with: orders, numberOfClient: clientCount)
+        self.mirror.startBank(initialOrder: orders, initialClientCount: clientCount)
         
-        bankManager.runBank(with: orders, numberOfClient: clientCount)
-    }
-    
-    func handle(menu: BankManagerAppMenu) {
-        switch menu {
-        case .open:
-            do {
-                try startBank()
-            } catch {
-                handle(error: error)
-//                return
-            }
-        case .end:
-            self.isRunning = false
-        }
     }
     
     func handle(error: Error) {
         self.output.display(output: error.localizedDescription)
     }
+}
+
+protocol BankInput {
+    func startBank(initialOrder: [Order], initialClientCount: Int)
+    func resetBank()
+    func addClients(count: Int)
+}
+
+protocol BankOutput {
+    func updateTimer()
+    func didStartWorking(of client: Client)
+    func didEndWorking(of client: Client)
 }

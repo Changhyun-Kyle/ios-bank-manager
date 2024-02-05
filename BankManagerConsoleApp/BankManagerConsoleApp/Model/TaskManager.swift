@@ -14,7 +14,9 @@ final class TaskManager {
     
     private let semaphore: DispatchSemaphore = .init(value: 1)
     
-    weak var delegate: TaskManagerDequeueDelegate?
+    private let clientSemaphore: DispatchSemaphore = .init(value: 1)
+    
+    weak var delegate: TaskManagerDelegate?
     
     init(
         clientQueue: Queue<Client> = .init(),
@@ -38,7 +40,7 @@ extension TaskManager: TaskManagable {
                     continue
                 }
                 // 시작했어!
-                self.delegate?.handleDequeue(client: client)
+                self.delegate?.handleDequeueClient(client: client)
                 banker.handle(client: client, group: group)
                 
                 guard
@@ -61,7 +63,22 @@ extension TaskManager: BankerEnqueuable {
 
 extension TaskManager: ClientEnqueuable {
     func enqueueClient(_ client: Client) {
+        self.clientSemaphore.wait()
         self.clientQueue.enqueue(client)
+        self.delegate?.handleEnqueue(newClient: client)
+        self.clientSemaphore.signal()
+    }
+}
+
+extension TaskManager: BankerStartWorkingDelegate {
+    func handleStartWorking(client: Client) {
+        
+    }
+}
+
+extension TaskManager: BankerEndWorkingDelegate {
+    func handleEndWorking(client: Client) {
+        
     }
 }
 
@@ -74,6 +91,16 @@ extension TaskManager {
     }
 }
 
-protocol TaskManagerDequeueDelegate: AnyObject {
-    func handleDequeue(client: Client)
+protocol TaskManagerEnqueueDelegate: AnyObject {
+    func handleEnqueue(newClient: Client)
 }
+
+protocol TaskManagerDequeueClientDelegate: AnyObject {
+    func handleDequeueClient(client: Client)
+}
+
+protocol TaskManagerDequeueWorkingClient: AnyObject {
+    func handleDequeueWorkingClient(client: Client)
+}
+
+typealias TaskManagerDelegate = TaskManagerEnqueueDelegate & TaskManagerDequeueClientDelegate & TaskManagerDequeueWorkingClient

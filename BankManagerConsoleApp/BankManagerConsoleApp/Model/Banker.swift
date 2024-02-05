@@ -10,13 +10,21 @@ import Foundation
 struct Banker {
     private let bankerEnqueuable: BankerEnqueuable
     
+    private let startWorkingDelegate: BankerStartWorkingDelegate
+    
+    private let endWorkingDelegate: BankerEndWorkingDelegate
+    
     private let resultOut: TextOutputDisplayable
     
     init(
         bankerEnqueuable: BankerEnqueuable,
+        startWorkingDelegate: BankerStartWorkingDelegate,
+        endWorkingDelegate: BankerEndWorkingDelegate,
         resultOut: TextOutputDisplayable
     ) {
         self.bankerEnqueuable = bankerEnqueuable
+        self.startWorkingDelegate = startWorkingDelegate
+        self.endWorkingDelegate = endWorkingDelegate
         self.resultOut = resultOut
     }
 }
@@ -24,14 +32,34 @@ struct Banker {
 extension Banker: ClientTaskHandlable {
     func handle(client: Client, group: DispatchGroup) {
         DispatchQueue.global().async(group: group) {
-            resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 시작")
+            startWork(client: client)
             processTask(for: client.task.duration)
-            resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 종료")
-            self.bankerEnqueuable.enqueueBanker(self)
+            endWork(client: client)
         }
     }
+}
+
+private extension Banker {
+    func startWork(client: Client) {
+        self.startWorkingDelegate.handleStartWorking(client: client)
+        resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 시작")
+    }
     
-    private func processTask(for duration: TimeInterval) {
+    func processTask(for duration: TimeInterval) {
         Thread.sleep(forTimeInterval: duration)
     }
+    
+    func endWork(client: Client) {
+        resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 종료")
+        self.endWorkingDelegate.handleEndWorking(client: client)
+        self.bankerEnqueuable.enqueueBanker(self)
+    }
+}
+
+protocol BankerStartWorkingDelegate: AnyObject {
+    func handleStartWorking(client: Client)
+}
+
+protocol BankerEndWorkingDelegate: AnyObject {
+    func handleEndWorking(client: Client)
 }

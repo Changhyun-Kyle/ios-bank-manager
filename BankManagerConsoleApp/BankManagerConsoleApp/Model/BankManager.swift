@@ -11,7 +11,7 @@ final class BankManager {
     
     private let dispenser: TicketDispenser
     
-    weak var mirror: BankManagerDequeueDelegate?
+    weak var delegate: (BankManagerDequeueDelegate & BankManagerEnqueueDelegate & BankManagerDequeueWorkingClient)?
     
     init(
         textOut: TextOutputDisplayable,
@@ -46,7 +46,12 @@ extension BankManager: BankRunnable {
 private extension BankManager {
     func makeBankers(order: Order, taskManager: TaskManager) {
         (1...order.bankerCount).forEach { _ in
-            let banker = Banker(bankerEnqueuable: taskManager, resultOut: self.textOut)
+            let banker = Banker(
+                bankerEnqueuable: taskManager,
+                startWorkingDelegate: taskManager,
+                endWorkingDelegate: taskManager,
+                resultOut: self.textOut
+            )
             taskManager.enqueueBanker(banker)
         }
     }
@@ -71,9 +76,21 @@ private extension BankManager {
     }
 }
 
-extension BankManager: TaskManagerDequeueDelegate {
-    func handleDequeue(client: Client) {
-        self.mirror?.handleDequeue(client: client)
+extension BankManager: TaskManagerDequeueClientDelegate {
+    func handleDequeueClient(client: Client) {
+        self.delegate?.handleDequeue(client: client)
+    }
+}
+
+extension BankManager: TaskManagerEnqueueDelegate {
+    func handleEnqueue(newClient: Client) {
+        self.delegate?.handleEnqueue(client: newClient)
+    }
+}
+
+extension BankManager: TaskManagerDequeueWorkingClient {
+    func handleDequeueWorkingClient(client: Client) {
+        self.delegate?.handleDequeueWorkingClient(client: client)
     }
 }
 
@@ -81,36 +98,10 @@ protocol BankManagerDequeueDelegate: AnyObject {
     func handleDequeue(client: Client)
 }
 
-final class BankMirror {
-    
-    private lazy var bankManager: BankRunnable? = nil
-    
-    private var list: [Client]
-    
-    init(
-        list: [Client] = []
-    ) {
-        self.list = list
-        
-        do {
-            #warning("야야 바꿔라")
-            let console = ConsoleManager()
-            let dispenser = try TicketDispenser(totalClientCount: 30)
-            
-            let manager = BankManager(textOut: console, dispenser: dispenser)
-            manager.mirror = self
-            self.bankManager = manager
-        } catch {
-            print(error)
-        }
-    }
+protocol BankManagerEnqueueDelegate: AnyObject {
+    func handleEnqueue(client: Client)
 }
 
-extension BankMirror: BankManagerDequeueDelegate {
-    func handleDequeue(client: Client) {
-        guard
-            let index = self.list.firstIndex(where: { target in client == target })
-        else { return }
-        self.list.remove(at: index)
-    }
+protocol BankManagerDequeueWorkingClient: AnyObject {
+    func handleDequeueWorkingClient(client: Client)
 }
