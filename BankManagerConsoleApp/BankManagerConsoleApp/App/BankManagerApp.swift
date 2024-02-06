@@ -89,15 +89,3 @@ private extension BankManagerApp {
         self.output.display(output: error.localizedDescription)
     }
 }
-
-protocol BankInput {
-    func startBank()
-    func resetBank()
-    func addClients(count: Int)
-}
-
-protocol BankOutput {
-    func updateTimer()
-    func didStartWorking(of client: Client)
-    func didEndWorking(of client: Client)
-}
