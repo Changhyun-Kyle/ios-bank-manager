@@ -246,10 +246,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C7694E61259C3EA20053667F /* Build configuration list for PBXNativeTarget "BankManagerUIApp" */;
 			buildPhases = (
+				276649702B7228D5005EB12D /* ShellScript */,
 				C7694E33259C3E9F0053667F /* Sources */,
 				C7694E34259C3E9F0053667F /* Frameworks */,
 				C7694E35259C3E9F0053667F /* Resources */,
-				276649702B7228D5005EB12D /* ShellScript */,
 			);
 			buildRules = (
 			);
