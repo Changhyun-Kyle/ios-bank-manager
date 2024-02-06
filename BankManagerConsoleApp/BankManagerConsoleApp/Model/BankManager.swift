@@ -9,55 +9,58 @@ import Foundation
 final class BankManager {
     private let textOut: TextOutputDisplayable
     
-    private let dispenser: TicketDispenser
+    private var taskManagers: [BankTask: TaskManagable]
     
     weak var delegate: BankManagerDelegate?
     
+    private var currentClientNumber: Int
+    
     init(
         textOut: TextOutputDisplayable,
-        dispenser: TicketDispenser
+        taskManagers: [BankTask: TaskManagable] = [:]
     ) {
         self.textOut = textOut
-        self.dispenser = dispenser
+        self.taskManagers = taskManagers
+        self.currentClientNumber = 0
+        self.taskManagers.forEach { (_, manager) in
+            manager
+        }
     }
 }
 
 extension BankManager: BankRunnable {
-    func runBank(with orders: [Order], numberOfClient: Int) {
+    func addClients(count: Int) {
+    }
+    
+    func runBank() {
         let group = DispatchGroup()
         let totalWorkTime = measure {
-            for order in orders {
-                let taskManager = TaskManager()
-                taskManager.delegate = self
-                makeClients(order: order, taskManager: taskManager)
-                makeBankers(order: order, taskManager: taskManager)
+            self.taskManagers.forEach { (_, taskManager) in
                 taskManager.startTaskManaging(group: group)
             }
             group.wait()
         }
         
-        summarizeDailyStatistics(
-            totalWorkTime: totalWorkTime,
-            numberOfClient: numberOfClient
-        )
+        //        summarizeDailyStatistics(
+        //            totalWorkTime: totalWorkTime,
+        //            numberOfClient: numberOfClient
+        //        )
+    }
+    
+    func resetBank() {
+        
     }
 }
 
 private extension BankManager {
-    func makeBankers(order: Order, taskManager: TaskManager) {
-        (1...order.bankerCount).forEach { _ in
-            let banker = Banker(
-                delegate: taskManager,
-                resultOut: self.textOut
-            )
-            taskManager.enqueueBanker(banker)
-        }
-    }
-    
-    func makeClients(order: Order, taskManager: TaskManager) {
-        while let number = self.dispenser.provideTicket(of: order.taskType) {
-            let client = Client(number: number, task: order.taskType)
+    func makeClients(count: Int) {
+        let types = self.taskManagers.map { $0.key }
+        for number in (currentClientNumber + 1)...(currentClientNumber + count) {
+            guard let type = types.randomElement() else { return }
+            let client = Client(number: number, task: type)
+            guard let taskManager = taskManagers[type] as? ClientEnqueuable else { return }
             taskManager.enqueueClient(client)
+            self.currentClientNumber = number
         }
     }
     
@@ -114,4 +117,6 @@ protocol BankManagerStartTaskDelegate: AnyObject {
     func handleStartTask(client: Client)
 }
 
+// swiftlint:disable line_length
 typealias BankManagerDelegate = BankManagerDequeueClientDelegate & BankManagerEnqueueClientDelegate & BankManagerEndTaskDelegate & BankManagerStartTaskDelegate
+// swiftlint:enable line_length

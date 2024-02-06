@@ -6,5 +6,9 @@
 //
 
 protocol BankRunnable {
-    func runBank(with orders: [Order], numberOfClient: Int)
+    func runBank()
+    
+    func resetBank()
+    
+    func addClients(count: Int)
 }

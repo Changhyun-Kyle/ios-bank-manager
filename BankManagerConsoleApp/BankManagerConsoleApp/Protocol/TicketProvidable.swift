@@ -6,5 +6,5 @@
 //
 
 protocol TicketProvidable {
-    func provideTicket(of taskType: BankTask) -> Int?
+    func provideTicket() -> Int?
 }

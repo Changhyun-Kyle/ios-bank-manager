@@ -82,8 +82,8 @@ private extension BankMirror {
 }
 
 extension BankMirror: BankInput {
-    func startBank(initialOrder: [Order], initialClientCount: Int) {
-        self.bankManager.runBank(with: initialOrder, numberOfClient: initialClientCount)
+    func startBank() {
+        self.bankManager.runBank()
     }
     
     func resetBank() {

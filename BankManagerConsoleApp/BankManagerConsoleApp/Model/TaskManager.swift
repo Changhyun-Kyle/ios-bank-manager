@@ -112,4 +112,6 @@ protocol TaskManagerDidEndTaskDelegate: AnyObject {
     func handleEndTask(client: Client)
 }
 
+// swiftlint:disable line_length
 typealias TaskManagerDelegate = TaskManagerEnqueueClientDelegate & TaskManagerDequeueClientDelegate & TaskManagerDidEndTaskDelegate & TaskManagerDidStartTaskDelegate
+// swiftlint:enable line_length

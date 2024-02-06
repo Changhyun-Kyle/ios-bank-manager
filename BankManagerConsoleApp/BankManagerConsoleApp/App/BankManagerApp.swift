@@ -18,21 +18,40 @@ final class BankManagerApp {
         self.input = inputHandler
         self.output = outputHandler
         
-        do {
-            let console = ConsoleManager()
-            let dispenser = try TicketDispenser(totalClientCount: 30)
+        let console = ConsoleManager()
+//            guard let clientCount = (10...30).randomElement() else { throw BankManagerAppError.outOfIndex }
+        
+        let orders = [
+            Order(taskType: .loan, bankerCount: 1),
+            Order(taskType: .deposit, bankerCount: 2),
+        ]
+        
+        var taskManagers = [BankTask: TaskManagable]()
+        
+        for order in orders {
+            let taskManager = TaskManager()
+            // TODO: TaskManager Delegate 설정
+//                taskManager.delegate = self
             
-            let manager = BankManager(
-                textOut: console,
-                dispenser: dispenser
-            )
+            (1...order.bankerCount).forEach { _ in
+                let banker = Banker(
+                    delegate: taskManager,
+                    resultOut: console
+                )
+                taskManager.enqueueBanker(banker)
+            }
             
-            self.mirror = BankMirror(bankManager: manager)
-        } catch {
-            print(error)
-            return nil
+            taskManagers.updateValue(taskManager, forKey: order.taskType)
         }
+        
+        let manager = BankManager(
+            textOut: console,
+            taskManagers: taskManagers
+        )
+        
+        self.mirror = BankMirror(bankManager: manager)
     }
+    
     
     func start() {
         while self.isRunning {
@@ -67,13 +86,7 @@ private extension BankManagerApp {
     }
     
     func startBank() throws {
-        guard let clientCount = (10...30).randomElement() else { throw BankManagerAppError.outOfIndex }
-        let dispenser = try TicketDispenser(totalClientCount: clientCount)
-        let orders = [
-            Order(taskType: .loan, bankerCount: 1),
-            Order(taskType: .deposit, bankerCount: 2),
-        ]
-        self.mirror.startBank(initialOrder: orders, initialClientCount: clientCount)
+        self.mirror.startBank()
     }
     
     func handle(error: Error) {
@@ -82,7 +95,7 @@ private extension BankManagerApp {
 }
 
 protocol BankInput {
-    func startBank(initialOrder: [Order], initialClientCount: Int)
+    func startBank()
     func resetBank()
     func addClients(count: Int)
 }
