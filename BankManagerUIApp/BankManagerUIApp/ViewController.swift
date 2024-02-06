@@ -7,12 +7,78 @@
 import UIKit
 
 final class ViewController: UIViewController {
+    private let timerView = TimerView()
+    
+    private let waitingQueueView = QueueView(type: .waiting)
+    
+    private let workingQueueView = QueueView(type: .working)
+    
+    private lazy var queueStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [
+            waitingQueueView,
+            workingQueueView,
+        ])
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        stackView.distribution = .fillEqually
+        return stackView
+    }()
+    
+    private lazy var buttonStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [
+            addClientButton,
+            clearButton,
+            startButton,
+        ])
+        stackView.axis = .horizontal
+        stackView.spacing = 5
+        stackView.distribution = .fillEqually
+        return stackView
+    }()
+    
+    private let startButton: UIButton = {
+        let button = UIButton(frame: .zero)
+        button.titleLabel?.text = "시작"
+        return button
+    }()
+    
+    private let clearButton: UIButton = {
+        let button = UIButton(frame: .zero)
+        button.titleLabel?.text = "초기화"
+        button.tintColor = .red
+        return button
+    }()
+    
+    private let addClientButton: UIButton = {
+        let button = UIButton(frame: .zero)
+        button.titleLabel?.text = "고객 10명 추가"
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = .white
+        setLayout()
+    }
+    
+    private func setLayout() {
+        let stack = UIStackView(arrangedSubviews: [
+            buttonStackView,
+            timerView,
+            queueStackView
+        ])
+        stack.axis = .vertical
+        self.view = stack
+        view.backgroundColor = .white
     }
 }
-
+extension UIView {
+    func addSubviews(_ views: UIView...){
+        for view in views {
+            self.addSubview(view)
+        }
+    }
+}
 enum BankQueue {
     case waiting
     case working
@@ -32,6 +98,26 @@ enum BankQueue {
     }
 }
 
+final class TimerView: UIView {
+    private let timerLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.text = "업무시간 - \("00:00:000")"
+        label.font = .preferredFont(forTextStyle: .title3)
+        return label
+    }()
+    
+    private func setLayout() {
+        self.addSubview(timerLabel)
+        NSLayoutConstraint.activate([
+            self.timerLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
+            self.timerLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 10),
+            self.timerLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 10),
+            self.timerLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 10),
+        ])
+    }
+    
+}
+
 final class QueueView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
@@ -39,10 +125,7 @@ final class QueueView: UIView {
         return label
     }()
     
-    private let list: ListStackView = {
-        
-        return ListStackView()
-    }()
+    private let list: ListStackView = ListStackView()
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {
