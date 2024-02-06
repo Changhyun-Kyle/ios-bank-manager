@@ -22,9 +22,6 @@ final class BankManager {
         self.textOut = textOut
         self.taskManagers = taskManagers
         self.currentClientNumber = 0
-        self.taskManagers.forEach { (_, manager) in
-            manager
-        }
     }
 }
 
@@ -40,11 +37,6 @@ extension BankManager: BankRunnable {
             }
             group.wait()
         }
-        
-        //        summarizeDailyStatistics(
-        //            totalWorkTime: totalWorkTime,
-        //            numberOfClient: numberOfClient
-        //        )
     }
     
     func resetBank() {

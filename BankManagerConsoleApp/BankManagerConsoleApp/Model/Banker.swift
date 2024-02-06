@@ -8,15 +8,11 @@
 import Foundation
 
 struct Banker {
-    private let delegate: BankerDelegate
-    
     private let resultOut: TextOutputDisplayable
     
-    init(
-        delegate: BankerDelegate,
-        resultOut: TextOutputDisplayable
-    ) {
-        self.delegate = delegate
+    weak var delegate: BankerDelegate?
+    
+    init(resultOut: TextOutputDisplayable) {
         self.resultOut = resultOut
     }
 }
@@ -33,7 +29,7 @@ extension Banker: ClientTaskHandlable {
 
 private extension Banker {
     func startWork(client: Client) {
-        self.delegate.handleStartWorking(client: client)
+        self.delegate?.handleStartWorking(client: client)
         resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 시작")
     }
     
@@ -43,7 +39,7 @@ private extension Banker {
     
     func endWork(client: Client) {
         resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 종료")
-        self.delegate.handleEndWorking(client: client, banker: self)
+        self.delegate?.handleEndWorking(client: client, banker: self)
     }
 }
 

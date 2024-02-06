@@ -17,41 +17,8 @@ final class BankManagerApp {
     init?(inputHandler: TextInputReadable, outputHandler: TextOutputDisplayable) {
         self.input = inputHandler
         self.output = outputHandler
-        
-        let console = ConsoleManager()
-//            guard let clientCount = (10...30).randomElement() else { throw BankManagerAppError.outOfIndex }
-        
-        let orders = [
-            Order(taskType: .loan, bankerCount: 1),
-            Order(taskType: .deposit, bankerCount: 2),
-        ]
-        
-        var taskManagers = [BankTask: TaskManagable]()
-        
-        for order in orders {
-            let taskManager = TaskManager()
-            // TODO: TaskManager Delegate 설정
-//                taskManager.delegate = self
-            
-            (1...order.bankerCount).forEach { _ in
-                let banker = Banker(
-                    delegate: taskManager,
-                    resultOut: console
-                )
-                taskManager.enqueueBanker(banker)
-            }
-            
-            taskManagers.updateValue(taskManager, forKey: order.taskType)
-        }
-        
-        let manager = BankManager(
-            textOut: console,
-            taskManagers: taskManagers
-        )
-        
-        self.mirror = BankMirror(bankManager: manager)
+        self.mirror = Self.makeBankMirror()
     }
-    
     
     func start() {
         while self.isRunning {
@@ -61,6 +28,35 @@ final class BankManagerApp {
 }
 
 private extension BankManagerApp {
+    // swiftlint:disable function_body_length
+    static func makeBankMirror() -> BankMirror {
+        let orders = [
+            Order(taskType: .loan, bankerCount: 1),
+            Order(taskType: .deposit, bankerCount: 2),
+        ]
+        
+        let console = ConsoleManager()
+        var taskManagers = [BankTask: TaskManagable]()
+        
+        let bankManager = BankManager(textOut: console, taskManagers: taskManagers)
+        
+        for order in orders {
+            let taskManager = TaskManager()
+            (1...order.bankerCount).forEach { _ in
+                var banker = Banker(resultOut: console)
+                banker.delegate = taskManager
+                taskManager.enqueueBanker(banker)
+            }
+            taskManager.delegate = bankManager
+            taskManagers.updateValue(taskManager, forKey: order.taskType)
+        }
+        
+        let mirror = BankMirror(bankManager: bankManager)
+        bankManager.delegate = mirror
+        return mirror
+    }
+    // swiftlint:enable function_body_length
+    
     func startLoop() {
         self.output.display(output: BankManagerAppMenu.allMenusPrompt)
         do {
