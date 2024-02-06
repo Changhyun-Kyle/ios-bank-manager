@@ -11,14 +11,16 @@ final class BankManager {
     
     private let dispenser: TicketDispenser
     
-    weak var delegate: (BankManagerDequeueDelegate & BankManagerEnqueueDelegate & BankManagerDequeueWorkingClient)?
+    private let delegate: BankManagerDelegate
     
     init(
         textOut: TextOutputDisplayable,
-        dispenser: TicketDispenser
+        dispenser: TicketDispenser,
+        delegate: BankManagerDelegate
     ) {
         self.textOut = textOut
         self.dispenser = dispenser
+        self.delegate = delegate
     }
 }
 
@@ -47,9 +49,7 @@ private extension BankManager {
     func makeBankers(order: Order, taskManager: TaskManager) {
         (1...order.bankerCount).forEach { _ in
             let banker = Banker(
-                bankerEnqueuable: taskManager,
-                startWorkingDelegate: taskManager,
-                endWorkingDelegate: taskManager,
+                delegate: taskManager,
                 resultOut: self.textOut
             )
             taskManager.enqueueBanker(banker)
@@ -78,30 +78,42 @@ private extension BankManager {
 
 extension BankManager: TaskManagerDequeueClientDelegate {
     func handleDequeueClient(client: Client) {
-        self.delegate?.handleDequeue(client: client)
+        self.delegate.handleDequeueClient(client: client)
     }
 }
 
-extension BankManager: TaskManagerEnqueueDelegate {
-    func handleEnqueue(newClient: Client) {
-        self.delegate?.handleEnqueue(client: newClient)
+extension BankManager: TaskManagerEnqueueClientDelegate {
+    func handleEnqueueClient(newClient: Client) {
+        self.delegate.handleEnqueueClient(client: newClient)
     }
 }
 
-extension BankManager: TaskManagerDequeueWorkingClient {
-    func handleDequeueWorkingClient(client: Client) {
-        self.delegate?.handleDequeueWorkingClient(client: client)
+extension BankManager: TaskManagerDidEndTaskDelegate {
+    func handleEndTask(client: Client) {
+        self.delegate.handleEndTask(client: client)
     }
 }
 
-protocol BankManagerDequeueDelegate: AnyObject {
-    func handleDequeue(client: Client)
+extension BankManager: TaskManagerDidStartTaskDelegate {
+    func handleStartTask(client: Client) {
+        self.delegate.handleStartTask(client: client)
+    }
 }
 
-protocol BankManagerEnqueueDelegate: AnyObject {
-    func handleEnqueue(client: Client)
+protocol BankManagerDequeueClientDelegate: AnyObject {
+    func handleDequeueClient(client: Client)
 }
 
-protocol BankManagerDequeueWorkingClient: AnyObject {
-    func handleDequeueWorkingClient(client: Client)
+protocol BankManagerEnqueueClientDelegate: AnyObject {
+    func handleEnqueueClient(client: Client)
 }
+
+protocol BankManagerEndTaskDelegate: AnyObject {
+    func handleEndTask(client: Client)
+}
+
+protocol BankManagerStartTaskDelegate: AnyObject {
+    func handleStartTask(client: Client)
+}
+
+typealias BankManagerDelegate = BankManagerDequeueClientDelegate & BankManagerEnqueueClientDelegate & BankManagerEndTaskDelegate & BankManagerStartTaskDelegate

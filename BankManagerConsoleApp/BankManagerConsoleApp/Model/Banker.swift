@@ -8,23 +8,15 @@
 import Foundation
 
 struct Banker {
-    private let bankerEnqueuable: BankerEnqueuable
-    
-    private let startWorkingDelegate: BankerStartWorkingDelegate
-    
-    private let endWorkingDelegate: BankerEndWorkingDelegate
+    private let delegate: BankerDelegate
     
     private let resultOut: TextOutputDisplayable
     
     init(
-        bankerEnqueuable: BankerEnqueuable,
-        startWorkingDelegate: BankerStartWorkingDelegate,
-        endWorkingDelegate: BankerEndWorkingDelegate,
+        delegate: BankerDelegate,
         resultOut: TextOutputDisplayable
     ) {
-        self.bankerEnqueuable = bankerEnqueuable
-        self.startWorkingDelegate = startWorkingDelegate
-        self.endWorkingDelegate = endWorkingDelegate
+        self.delegate = delegate
         self.resultOut = resultOut
     }
 }
@@ -41,7 +33,7 @@ extension Banker: ClientTaskHandlable {
 
 private extension Banker {
     func startWork(client: Client) {
-        self.startWorkingDelegate.handleStartWorking(client: client)
+        self.delegate.handleStartWorking(client: client)
         resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 시작")
     }
     
@@ -51,8 +43,7 @@ private extension Banker {
     
     func endWork(client: Client) {
         resultOut.display(output: "\(client.number)번 고객 \(client.task.name) 종료")
-        self.endWorkingDelegate.handleEndWorking(client: client)
-        self.bankerEnqueuable.enqueueBanker(self)
+        self.delegate.handleEndWorking(client: client, banker: self)
     }
 }
 
@@ -61,5 +52,7 @@ protocol BankerStartWorkingDelegate: AnyObject {
 }
 
 protocol BankerEndWorkingDelegate: AnyObject {
-    func handleEndWorking(client: Client)
+    func handleEndWorking(client: Client, banker: ClientTaskHandlable)
 }
+
+typealias BankerDelegate = BankerStartWorkingDelegate & BankerEndWorkingDelegate

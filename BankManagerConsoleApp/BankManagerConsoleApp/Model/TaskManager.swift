@@ -12,7 +12,7 @@ final class TaskManager {
     
     private let bankerQueue: Queue<ClientTaskHandlable>
     
-    private let semaphore: DispatchSemaphore = .init(value: 1)
+    private let bankerSemaphore: DispatchSemaphore = .init(value: 1)
     
     private let clientSemaphore: DispatchSemaphore = .init(value: 1)
     
@@ -30,24 +30,17 @@ final class TaskManager {
 extension TaskManager: TaskManagable {
     func startTaskManaging(group: DispatchGroup) {
         let bankerCount = self.bankerQueue.count
-        
         DispatchQueue.global().async(group: group) {
             while self.clientQueue.isEmpty == false {
                 guard
                     let banker = self.dequeueBanker(),
-                    let client = self.clientQueue.dequeue()
+                    let client = self.dequeueClient()
                 else {
                     continue
                 }
-                // 시작했어!
-                self.delegate?.handleDequeueClient(client: client)
                 banker.handle(client: client, group: group)
                 
-                guard
-                    self.bankerQueue.count != bankerCount
-                else {
-                    break
-                }
+                guard self.bankerQueue.count != bankerCount else { break }
             }
         }
     }
@@ -55,9 +48,9 @@ extension TaskManager: TaskManagable {
 
 extension TaskManager: BankerEnqueuable {
     func enqueueBanker(_ taskHandlable: ClientTaskHandlable) {
-        self.semaphore.wait()
+        self.bankerSemaphore.wait()
         self.bankerQueue.enqueue(taskHandlable)
-        self.semaphore.signal()
+        self.bankerSemaphore.signal()
     }
 }
 
@@ -65,42 +58,58 @@ extension TaskManager: ClientEnqueuable {
     func enqueueClient(_ client: Client) {
         self.clientSemaphore.wait()
         self.clientQueue.enqueue(client)
-        self.delegate?.handleEnqueue(newClient: client)
+        self.delegate?.handleEnqueueClient(newClient: client)
         self.clientSemaphore.signal()
     }
 }
 
 extension TaskManager: BankerStartWorkingDelegate {
     func handleStartWorking(client: Client) {
-        
+        self.delegate?.handleStartTask(client: client)
     }
 }
 
 extension TaskManager: BankerEndWorkingDelegate {
-    func handleEndWorking(client: Client) {
-        
+    func handleEndWorking(client: Client, banker: ClientTaskHandlable) {
+        self.delegate?.handleEndTask(client: client)
+        self.enqueueBanker(banker)
     }
 }
 
-extension TaskManager {
-    private func dequeueBanker() -> ClientTaskHandlable? {
-        self.semaphore.wait()
+private extension TaskManager {
+    func dequeueBanker() -> ClientTaskHandlable? {
+        self.bankerSemaphore.wait()
         let result = self.bankerQueue.dequeue()
-        self.semaphore.signal()
+        self.bankerSemaphore.signal()
         return result
     }
+    
+    func dequeueClient() -> Client? {
+        self.clientSemaphore.wait()
+        guard let client = self.clientQueue.dequeue() else {
+            self.clientSemaphore.signal()
+            return nil
+        }
+        self.delegate?.handleDequeueClient(client: client)
+        self.clientSemaphore.signal()
+        return client
+    }
 }
 
-protocol TaskManagerEnqueueDelegate: AnyObject {
-    func handleEnqueue(newClient: Client)
+protocol TaskManagerEnqueueClientDelegate: AnyObject {
+    func handleEnqueueClient(newClient: Client)
 }
 
 protocol TaskManagerDequeueClientDelegate: AnyObject {
     func handleDequeueClient(client: Client)
 }
 
-protocol TaskManagerDequeueWorkingClient: AnyObject {
-    func handleDequeueWorkingClient(client: Client)
+protocol TaskManagerDidStartTaskDelegate: AnyObject {
+    func handleStartTask(client: Client)
 }
 
-typealias TaskManagerDelegate = TaskManagerEnqueueDelegate & TaskManagerDequeueClientDelegate & TaskManagerDequeueWorkingClient
+protocol TaskManagerDidEndTaskDelegate: AnyObject {
+    func handleEndTask(client: Client)
+}
+
+typealias TaskManagerDelegate = TaskManagerEnqueueClientDelegate & TaskManagerDequeueClientDelegate & TaskManagerDidEndTaskDelegate & TaskManagerDidStartTaskDelegate

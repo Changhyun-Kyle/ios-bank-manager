@@ -5,27 +5,35 @@
 //  Created by Effie on 2/5/24.
 //
 
+import Foundation
+
 final class BankMirror {
     private lazy var bankManager: BankRunnable? = nil
     
-    private var list: [Client]
+    private var waitingList: [Client]
     
     private var workingList: [Client]
     
+    private var waitingSemaphore = DispatchSemaphore(value: 1)
+    
+    private var workingSemaphore = DispatchSemaphore(value: 1)
+    
     init(
-        list: [Client] = [],
+        waitingList: [Client] = [],
         workingList: [Client] = []
     ) {
-        self.list = list
+        self.waitingList = waitingList
         self.workingList = workingList
         
         do {
-            #warning("야야 바꿔라")
             let console = ConsoleManager()
             let dispenser = try TicketDispenser(totalClientCount: 30)
             
-            let manager = BankManager(textOut: console, dispenser: dispenser)
-            manager.delegate = self
+            let manager = BankManager(
+                textOut: console,
+                dispenser: dispenser,
+                delegate: self
+            )
             self.bankManager = manager
         } catch {
             print(error)
@@ -33,47 +41,59 @@ final class BankMirror {
     }
 }
 
-extension BankMirror: BankManagerDequeueDelegate {
-    func handleDequeue(client: Client) {
+extension BankMirror: BankManagerDequeueClientDelegate {
+    func handleDequeueClient(client: Client) {
         removeWaitingClient(client: client)
-        addWorkingClient(client: client)
     }
 }
 
-extension BankMirror: BankManagerEnqueueDelegate {
-    func handleEnqueue(client: Client) {
+extension BankMirror: BankManagerEnqueueClientDelegate {
+    func handleEnqueueClient(client: Client) {
         addWaitingClient(client: client)
     }
 }
 
-extension BankMirror: BankManagerDequeueWorkingClient {
-    func handleDequeueWorkingClient(client: Client) {
+extension BankMirror: BankManagerEndTaskDelegate {
+    func handleEndTask(client: Client) {
         removeWorkingClient(client: client)
     }
 }
 
+extension BankMirror: BankManagerStartTaskDelegate {
+    func handleStartTask(client: Client) {
+        addWorkingClient(client: client)
+    }
+}
+
 private extension BankMirror {
+    func addWaitingClient(client: Client) {
+        self.waitingSemaphore.wait()
+        self.waitingList.append(client)
+        self.waitingSemaphore.signal()
+    }
+    
     func removeWaitingClient(client: Client) {
+        self.waitingSemaphore.wait()
         guard
-            let index = self.list.firstIndex(where: { target in client == target })
+            let index = self.waitingList.firstIndex(where: { target in client == target })
         else { return }
-        self.list.remove(at: index)
+        self.waitingList.remove(at: index)
+        self.waitingSemaphore.signal()
     }
     
     func addWorkingClient(client: Client) {
+        self.workingSemaphore.wait()
         self.workingList.append(client)
-    }
-    
-    func addWaitingClient(client: Client) {
-        // race...
-        self.list.append(client)
+        self.workingSemaphore.signal()
     }
     
     func removeWorkingClient(client: Client) {
+        self.workingSemaphore.wait()
         guard
             let index = self.workingList.firstIndex(where: { target in client == target })
         else { return }
         self.workingList.remove(at: index)
+        self.workingSemaphore.signal()
     }
 }
 

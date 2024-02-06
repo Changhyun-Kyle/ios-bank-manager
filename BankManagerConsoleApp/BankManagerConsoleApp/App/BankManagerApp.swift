@@ -55,18 +55,10 @@ private extension BankManagerApp {
     func startBank() throws {
         guard let clientCount = (10...30).randomElement() else { throw BankManagerAppError.outOfIndex }
         let dispenser = try TicketDispenser(totalClientCount: clientCount)
-        
         let orders = [
             Order(taskType: .loan, bankerCount: 1),
             Order(taskType: .deposit, bankerCount: 2),
         ]
-        
-//        let bankManager = BankManager(
-//            textOut: self.output,
-//            dispenser: dispenser
-//        )
-//        
-//        bankManager.runBank(with: orders, numberOfClient: clientCount)
         self.mirror.startBank(initialOrder: orders, initialClientCount: clientCount)
         
     }
