@@ -29,7 +29,6 @@ final class TaskManager {
 
 extension TaskManager: TaskManagable {
     func startTaskManaging(group: DispatchGroup) {
-        let bankerCount = self.bankerQueue.count
         DispatchQueue.global().async(group: group) {
             while self.clientQueue.isEmpty == false {
                 guard
@@ -39,10 +38,13 @@ extension TaskManager: TaskManagable {
                     continue
                 }
                 banker.handle(client: client, group: group)
-                
-                guard self.bankerQueue.count != bankerCount else { break }
             }
         }
+    }
+    
+    func resetTask() {
+        self.clientQueue.clear()
+        self.bankerQueue.clear()
     }
 }
 

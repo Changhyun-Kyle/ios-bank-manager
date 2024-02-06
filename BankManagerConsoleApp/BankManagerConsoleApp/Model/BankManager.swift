@@ -27,6 +27,7 @@ final class BankManager {
 
 extension BankManager: BankRunnable {
     func addClients(count: Int) {
+        makeClients(count: count)
     }
     
     func runBank() {
@@ -40,7 +41,9 @@ extension BankManager: BankRunnable {
     }
     
     func resetBank() {
-        
+        for (_, taskManager) in self.taskManagers {
+            taskManager.resetTask()
+        }
     }
 }
 

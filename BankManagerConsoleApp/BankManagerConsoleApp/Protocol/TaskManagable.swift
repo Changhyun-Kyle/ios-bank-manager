@@ -9,4 +9,6 @@ import Foundation
 
 protocol TaskManagable {
     func startTaskManaging(group: DispatchGroup)
+    
+    func resetTask()
 }

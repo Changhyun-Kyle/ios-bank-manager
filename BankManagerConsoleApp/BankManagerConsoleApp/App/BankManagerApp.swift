@@ -42,12 +42,12 @@ private extension BankManagerApp {
         
         for order in orders {
             let taskManager = TaskManager()
+            taskManager.delegate = bankManager
             (1...order.bankerCount).forEach { _ in
                 var banker = Banker(resultOut: console)
                 banker.delegate = taskManager
                 taskManager.enqueueBanker(banker)
             }
-            taskManager.delegate = bankManager
             taskManagers.updateValue(taskManager, forKey: order.taskType)
         }
         
