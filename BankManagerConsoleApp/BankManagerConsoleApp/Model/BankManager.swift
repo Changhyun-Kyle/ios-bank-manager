@@ -11,16 +11,14 @@ final class BankManager {
     
     private let dispenser: TicketDispenser
     
-    private let delegate: BankManagerDelegate
+    weak var delegate: BankManagerDelegate?
     
     init(
         textOut: TextOutputDisplayable,
-        dispenser: TicketDispenser,
-        delegate: BankManagerDelegate
+        dispenser: TicketDispenser
     ) {
         self.textOut = textOut
         self.dispenser = dispenser
-        self.delegate = delegate
     }
 }
 
@@ -78,25 +76,25 @@ private extension BankManager {
 
 extension BankManager: TaskManagerDequeueClientDelegate {
     func handleDequeueClient(client: Client) {
-        self.delegate.handleDequeueClient(client: client)
+        self.delegate?.handleDequeueClient(client: client)
     }
 }
 
 extension BankManager: TaskManagerEnqueueClientDelegate {
     func handleEnqueueClient(newClient: Client) {
-        self.delegate.handleEnqueueClient(client: newClient)
+        self.delegate?.handleEnqueueClient(client: newClient)
     }
 }
 
 extension BankManager: TaskManagerDidEndTaskDelegate {
     func handleEndTask(client: Client) {
-        self.delegate.handleEndTask(client: client)
+        self.delegate?.handleEndTask(client: client)
     }
 }
 
 extension BankManager: TaskManagerDidStartTaskDelegate {
     func handleStartTask(client: Client) {
-        self.delegate.handleStartTask(client: client)
+        self.delegate?.handleStartTask(client: client)
     }
 }
 

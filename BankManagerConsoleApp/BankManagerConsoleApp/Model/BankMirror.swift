@@ -8,7 +8,7 @@
 import Foundation
 
 final class BankMirror {
-    private lazy var bankManager: BankRunnable? = nil
+    private let bankManager: BankRunnable
     
     private var waitingList: [Client]
     
@@ -18,26 +18,10 @@ final class BankMirror {
     
     private var workingSemaphore = DispatchSemaphore(value: 1)
     
-    init(
-        waitingList: [Client] = [],
-        workingList: [Client] = []
-    ) {
-        self.waitingList = waitingList
-        self.workingList = workingList
-        
-        do {
-            let console = ConsoleManager()
-            let dispenser = try TicketDispenser(totalClientCount: 30)
-            
-            let manager = BankManager(
-                textOut: console,
-                dispenser: dispenser,
-                delegate: self
-            )
-            self.bankManager = manager
-        } catch {
-            print(error)
-        }
+    init(bankManager: BankRunnable) {
+        self.waitingList = []
+        self.workingList = []
+        self.bankManager = bankManager
     }
 }
 
@@ -99,7 +83,7 @@ private extension BankMirror {
 
 extension BankMirror: BankInput {
     func startBank(initialOrder: [Order], initialClientCount: Int) {
-        self.bankManager?.runBank(with: initialOrder, numberOfClient: initialClientCount)
+        self.bankManager.runBank(with: initialOrder, numberOfClient: initialClientCount)
     }
     
     func resetBank() {

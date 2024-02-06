@@ -14,10 +14,24 @@ final class BankManagerApp {
     
     private var isRunning: Bool = true
     
-    init(inputHandler: TextInputReadable, outputHandler: TextOutputDisplayable) {
+    init?(inputHandler: TextInputReadable, outputHandler: TextOutputDisplayable) {
         self.input = inputHandler
         self.output = outputHandler
-        self.mirror = BankMirror()
+        
+        do {
+            let console = ConsoleManager()
+            let dispenser = try TicketDispenser(totalClientCount: 30)
+            
+            let manager = BankManager(
+                textOut: console,
+                dispenser: dispenser
+            )
+            
+            self.mirror = BankMirror(bankManager: manager)
+        } catch {
+            print(error)
+            return nil
+        }
     }
     
     func start() {
@@ -60,7 +74,6 @@ private extension BankManagerApp {
             Order(taskType: .deposit, bankerCount: 2),
         ]
         self.mirror.startBank(initialOrder: orders, initialClientCount: clientCount)
-        
     }
     
     func handle(error: Error) {

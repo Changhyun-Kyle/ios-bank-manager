@@ -5,4 +5,5 @@
 //
 
 let console = ConsoleManager()
-BankManagerApp(inputHandler: console, outputHandler: console).start()
+let bankManager = BankManagerApp(inputHandler: console, outputHandler: console)
+bankManager?.start()
