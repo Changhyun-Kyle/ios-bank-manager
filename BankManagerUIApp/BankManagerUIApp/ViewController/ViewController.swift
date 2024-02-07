@@ -99,16 +99,23 @@ final class ViewController: UIViewController {
         self.waitingListTableView.delegate = self
         self.workingListTableView.delegate = self
         setButtonAction()
-        addClient()
+        addClient(count: 5)
     }
     
     private func setButtonAction() {
-        let action = UIAction { _ in self.runBank() }
-        self.startButton.addAction(action, for: .touchUpInside)
+        self.startButton.addAction(
+            UIAction { _ in self.runBank() },
+            for: .touchUpInside
+        )
+        
+        self.addClientButton.addAction(
+            UIAction { _ in self.addClient(count: 10) },
+            for: .touchUpInside
+        )
     }
     
-    private func addClient() {
-        self.bankMirror.addClients(count: 30)
+    private func addClient(count: Int) {
+        self.bankMirror.addClients(count: count)
     }
     
     private func runBank() {

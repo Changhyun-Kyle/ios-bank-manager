@@ -27,7 +27,9 @@ final class BankManager {
 
 extension BankManager: BankRunnable {
     func addClients(count: Int) {
-        makeClients(count: count)
+        DispatchQueue.global().async {
+            self.makeClients(count: count)
+        }
     }
     
     func runBank() {
