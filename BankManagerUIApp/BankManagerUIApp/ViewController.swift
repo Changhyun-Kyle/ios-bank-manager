@@ -6,87 +6,121 @@
 
 import UIKit
 
+enum BMColor {
+    static let purple = UIColor(named: "BMPurple")
+    static let green = UIColor(named: "BMGreen")
+}
+
 final class ViewController: UIViewController {
-    private let timerView = TimerView()
-    
-    private let waitingQueueView = QueueView(type: .waiting)
-    
-    private let workingQueueView = QueueView(type: .working)
-    
-    private lazy var queueStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [
-            waitingQueueView,
-            workingQueueView,
-        ])
-        stackView.axis = .horizontal
-        stackView.spacing = 0
-        stackView.distribution = .fillEqually
-        return stackView
-    }()
-    
-    private lazy var buttonStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [
-            addClientButton,
-            clearButton,
-            startButton,
-        ])
-        stackView.axis = .horizontal
-        stackView.spacing = 5
-        stackView.distribution = .fillEqually
-        return stackView
-    }()
-    
-    private let startButton: UIButton = {
+    // MARK: UI Elements
+    private let addClientButton: UIButton = {
         let button = UIButton(frame: .zero)
-        button.titleLabel?.text = "시작"
+        button.setTitle("10명 추가", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
         return button
     }()
     
     private let clearButton: UIButton = {
         let button = UIButton(frame: .zero)
-        button.titleLabel?.text = "초기화"
-        button.tintColor = .red
+        button.setTitle("초기화", for: .normal)
+        button.setTitleColor(.red, for: .normal)
         return button
     }()
     
-    private let addClientButton: UIButton = {
+    private let startButton: UIButton = {
         let button = UIButton(frame: .zero)
-        button.titleLabel?.text = "고객 10명 추가"
+        button.setTitle("시작", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
         return button
     }()
+    
+    private lazy var buttonStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 5
+        stackView.distribution = .fillEqually
+        
+        stackView.addArrangedSubview(self.addClientButton)
+        stackView.addArrangedSubview(self.clearButton)
+        stackView.addArrangedSubview(self.startButton)
+        return stackView
+    }()
+    
+    private let timerView: TimerView = TimerView()
+    
+    private let waitingQueueView = ListView(type: .waiting)
+    
+    private let workingQueueView = ListView(type: .working)
+    
+    private lazy var queueStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        stackView.distribution = .fillEqually
+        
+        stackView.addArrangedSubview(self.waitingQueueView)
+        stackView.addArrangedSubview(self.workingQueueView)
+        return stackView
+    }()
+    
+    private lazy var containerView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        
+        stackView.addArrangedSubview(self.buttonStackView)
+        stackView.addArrangedSubview(self.timerView)
+        stackView.addArrangedSubview(self.queueStackView)
+        
+        return stackView
+    }()
+    
+    // MARK: Lifecycle Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setLayout()
+        
+        self.waitingQueueView.addLabel(client: .init(number: 1, task: .deposit))
+        self.waitingQueueView.addLabel(client: .init(number: 2, task: .loan))
     }
-    
-    private func setLayout() {
-        let stack = UIStackView(arrangedSubviews: [
-            buttonStackView,
-            timerView,
-            queueStackView
+}
+
+private extension ViewController {
+    func setLayout() {
+        self.view.backgroundColor = .white
+        self.view.addSubview(containerView)
+        self.addClientButton.translatesAutoresizingMaskIntoConstraints = false
+        self.clearButton.translatesAutoresizingMaskIntoConstraints = false
+        self.startButton.translatesAutoresizingMaskIntoConstraints = false
+        self.buttonStackView.translatesAutoresizingMaskIntoConstraints = false
+        self.timerView.translatesAutoresizingMaskIntoConstraints = false
+        self.waitingQueueView.translatesAutoresizingMaskIntoConstraints = false
+        self.workingQueueView.translatesAutoresizingMaskIntoConstraints = false
+        self.queueStackView.translatesAutoresizingMaskIntoConstraints = false
+        self.containerView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            self.containerView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            self.containerView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            self.containerView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            self.containerView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
+            
+            self.buttonStackView.heightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05),
+            self.timerView.heightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.1),
         ])
-        stack.axis = .vertical
-        self.view = stack
-        view.backgroundColor = .white
     }
 }
-extension UIView {
-    func addSubviews(_ views: UIView...){
-        for view in views {
-            self.addSubview(view)
-        }
-    }
-}
-enum BankQueue {
+
+enum BankList {
     case waiting
     case working
     
-    var backgroundColor: UIColor {
+    var backgroundColor: UIColor? {
         switch self {
-        case .waiting: return .green
-        case .working: return .purple
+        case .waiting: return BMColor.green
+        case .working: return BMColor.purple
         }
     }
     
@@ -102,26 +136,41 @@ final class TimerView: UIView {
     private let timerLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.text = "업무시간 - \("00:00:000")"
-        label.font = .preferredFont(forTextStyle: .title3)
+        label.textAlignment = .center
+        label.font = .preferredFont(forTextStyle: .title2)
         return label
     }()
     
-    private func setLayout() {
-        self.addSubview(timerLabel)
-        NSLayoutConstraint.activate([
-            self.timerLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
-            self.timerLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 10),
-            self.timerLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 10),
-            self.timerLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 10),
-        ])
+    init() {
+        super.init(frame: .zero)
+        setLayout()
     }
     
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setLayout() {
+        self.addSubview(timerLabel)
+        self.timerLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            self.timerLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
+            self.timerLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10),
+            self.timerLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 10),
+            self.timerLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
+        ])
+    }
 }
 
-final class QueueView: UIView {
+final class ListView: UIView {
+    typealias Label = ListLabel
+    
     private let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.font = .preferredFont(forTextStyle: .title1)
+        label.font = .preferredFont(forTextStyle: .largeTitle)
+        label.textAlignment = .center
+        label.textColor = .white
         return label
     }()
     
@@ -132,15 +181,19 @@ final class QueueView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(type: BankQueue) {
+    init(type: BankList) {
         super.init(frame: .zero)
         self.titleLabel.text = type.name
-        self.backgroundColor = type.backgroundColor
+        self.titleLabel.backgroundColor = type.backgroundColor
+        setLayout()
     }
     
     private func setLayout() {
         self.addSubview(self.titleLabel)
         self.addSubview(self.list)
+        
+        self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.list.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             self.titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor),
@@ -149,8 +202,18 @@ final class QueueView: UIView {
             
             self.list.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor, constant: 10),
             self.list.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            self.list.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.list.widthAnchor.constraint(equalTo: self.widthAnchor),
+            self.list.bottomAnchor.constraint(lessThanOrEqualTo: self.bottomAnchor),
         ])
+        
+        let listViewHeight = self.list.heightAnchor.constraint(equalToConstant: 1)
+        listViewHeight.priority = .defaultLow
+        listViewHeight.isActive = true
+    }
+    
+    func addLabel(client: Client) {
+        let label = Label(client: client)
+        self.list.addArrangedSubview(label)
     }
 }
 
@@ -175,8 +238,8 @@ final class ListStackView: UIStackView {
     init() {
         super.init(frame: .zero)
         self.axis = .vertical
-        self.spacing = 5
-        self.alignment = .top
+        self.spacing = 10
+        self.alignment = .center
     }
     
     func removeLabel(index: Int) {
@@ -199,6 +262,8 @@ final class ListLabel: UILabel {
     
     init(client: Client) {
         super.init(frame: .zero)
+        self.textAlignment = .center
+        self.font = .preferredFont(forTextStyle: .title3)
         configure(client: client)
     }
     
