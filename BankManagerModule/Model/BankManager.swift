@@ -31,12 +31,14 @@ extension BankManager: BankRunnable {
     }
     
     func runBank() {
-        let group = DispatchGroup()
-        let totalWorkTime = measure {
-            self.taskManagers.forEach { (_, taskManager) in
-                taskManager.startTaskManaging(group: group)
+        DispatchQueue.global().async {
+            let group = DispatchGroup()
+            let totalWorkTime = self.measure {
+                self.taskManagers.forEach { (_, taskManager) in
+                    taskManager.startTaskManaging(group: group)
+                }
+                group.wait()
             }
-            group.wait()
         }
     }
     
