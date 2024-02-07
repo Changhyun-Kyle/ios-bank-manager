@@ -39,6 +39,11 @@
 		F4BC6E042B7368DB0018D7CB /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E032B7368DB0018D7CB /* ListView.swift */; };
 		F4BC6E062B7369040018D7CB /* ListStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E052B7369040018D7CB /* ListStackView.swift */; };
 		F4BC6E082B73691C0018D7CB /* ListLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E072B73691C0018D7CB /* ListLabel.swift */; };
+		F4BC6E102B738F910018D7CB /* ClientListTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E0F2B738F910018D7CB /* ClientListTableView.swift */; };
+		F4BC6E122B7392200018D7CB /* ClientListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E112B7392200018D7CB /* ClientListHeaderView.swift */; };
+		F4BC6E142B7393040018D7CB /* ClientListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E132B7393040018D7CB /* ClientListTableViewCell.swift */; };
+		F4BC6E162B7393260018D7CB /* ReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E152B7393260018D7CB /* ReusableView.swift */; };
+		F4BC6E182B73947E0018D7CB /* ClientListDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E172B73947E0018D7CB /* ClientListDataSource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +102,11 @@
 		F4BC6E032B7368DB0018D7CB /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
 		F4BC6E052B7369040018D7CB /* ListStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStackView.swift; sourceTree = "<group>"; };
 		F4BC6E072B73691C0018D7CB /* ListLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListLabel.swift; sourceTree = "<group>"; };
+		F4BC6E0F2B738F910018D7CB /* ClientListTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientListTableView.swift; sourceTree = "<group>"; };
+		F4BC6E112B7392200018D7CB /* ClientListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientListHeaderView.swift; sourceTree = "<group>"; };
+		F4BC6E132B7393040018D7CB /* ClientListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientListTableViewCell.swift; sourceTree = "<group>"; };
+		F4BC6E152B7393260018D7CB /* ReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableView.swift; sourceTree = "<group>"; };
+		F4BC6E172B73947E0018D7CB /* ClientListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientListDataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -261,6 +271,7 @@
 				F4BC6E032B7368DB0018D7CB /* ListView.swift */,
 				F4BC6E052B7369040018D7CB /* ListStackView.swift */,
 				F4BC6E072B73691C0018D7CB /* ListLabel.swift */,
+				F4BC6E192B73973A0018D7CB /* TableView */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -279,6 +290,18 @@
 				C7694E3E259C3E9F0053667F /* ViewController.swift */,
 			);
 			path = ViewController;
+			sourceTree = "<group>";
+		};
+		F4BC6E192B73973A0018D7CB /* TableView */ = {
+			isa = PBXGroup;
+			children = (
+				F4BC6E0F2B738F910018D7CB /* ClientListTableView.swift */,
+				F4BC6E132B7393040018D7CB /* ClientListTableViewCell.swift */,
+				F4BC6E112B7392200018D7CB /* ClientListHeaderView.swift */,
+				F4BC6E152B7393260018D7CB /* ReusableView.swift */,
+				F4BC6E172B73947E0018D7CB /* ClientListDataSource.swift */,
+			);
+			path = TableView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -432,9 +455,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4BC6E102B738F910018D7CB /* ClientListTableView.swift in Sources */,
 				F44B07BF2B7225890063AE08 /* LinkedList.swift in Sources */,
+				F4BC6E182B73947E0018D7CB /* ClientListDataSource.swift in Sources */,
 				C7694E3F259C3E9F0053667F /* ViewController.swift in Sources */,
 				F44B07CD2B7225890063AE08 /* TaskManager.swift in Sources */,
+				F4BC6E122B7392200018D7CB /* ClientListHeaderView.swift in Sources */,
 				F44B07BE2B7225890063AE08 /* Node.swift in Sources */,
 				F44B07CE2B7225890063AE08 /* BankMirror.swift in Sources */,
 				F44B07C02B7225890063AE08 /* ClientEnqueuable.swift in Sources */,
@@ -457,6 +483,8 @@
 				F44B07C52B7225890063AE08 /* BankerEnqueuable.swift in Sources */,
 				F44B07C42B7225890063AE08 /* TaskManagable.swift in Sources */,
 				F44B07C72B7225890063AE08 /* BankRunnable.swift in Sources */,
+				F4BC6E162B7393260018D7CB /* ReusableView.swift in Sources */,
+				F4BC6E142B7393040018D7CB /* ClientListTableViewCell.swift in Sources */,
 				F44B07BD2B7225890063AE08 /* Queue.swift in Sources */,
 				F44B07C32B7225890063AE08 /* TextOutputDisplayable.swift in Sources */,
 				F44B07C22B7225890063AE08 /* TextInputReadable.swift in Sources */,

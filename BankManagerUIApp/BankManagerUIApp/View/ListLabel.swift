@@ -13,6 +13,12 @@ final class ListLabel: UILabel {
         fatalError("init(coder:) has not been implemented")
     }
     
+    init() {
+        super.init(frame: .zero)
+        self.textAlignment = .center
+        self.font = .preferredFont(forTextStyle: .title3)
+    }
+    
     init(client: Client) {
         super.init(frame: .zero)
         self.textAlignment = .center

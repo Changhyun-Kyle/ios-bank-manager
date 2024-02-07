@@ -43,18 +43,18 @@ final class ViewController: UIViewController {
     
     private let timerView: TimerView = TimerView()
     
-    private let waitingQueueView = ListView(type: .waiting)
+    private let waitingListTableView = ClientListTableView(type: .waiting)
     
-    private let workingQueueView = ListView(type: .working)
+    private let workingListTableView = ClientListTableView(type: .working)
     
-    private lazy var queueStackView: UIStackView = {
+    private lazy var listStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
         stackView.distribution = .fillEqually
         
-        stackView.addArrangedSubview(self.waitingQueueView)
-        stackView.addArrangedSubview(self.workingQueueView)
+        stackView.addArrangedSubview(self.waitingListTableView)
+        stackView.addArrangedSubview(self.workingListTableView)
         return stackView
     }()
     
@@ -65,10 +65,14 @@ final class ViewController: UIViewController {
         
         stackView.addArrangedSubview(self.buttonStackView)
         stackView.addArrangedSubview(self.timerView)
-        stackView.addArrangedSubview(self.queueStackView)
+        stackView.addArrangedSubview(self.listStackView)
         
         return stackView
     }()
+    
+    private lazy var waitingListDataSource = ClientListDataSource(self.waitingListTableView)
+    
+    private lazy var workingListDataSource = ClientListDataSource(self.workingListTableView)
     
     // MARK: Lifecycle Methods
     
@@ -76,9 +80,11 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setLayout()
+        applyUpdatedWaitingList()
+        applyUpdatedWorkingList()
         
-        self.waitingQueueView.addLabel(client: .init(number: 1, task: .deposit))
-        self.waitingQueueView.addLabel(client: .init(number: 2, task: .loan))
+        self.waitingListTableView.delegate = self
+        self.workingListTableView.delegate = self
     }
 }
 
@@ -91,9 +97,9 @@ private extension ViewController {
         self.startButton.translatesAutoresizingMaskIntoConstraints = false
         self.buttonStackView.translatesAutoresizingMaskIntoConstraints = false
         self.timerView.translatesAutoresizingMaskIntoConstraints = false
-        self.waitingQueueView.translatesAutoresizingMaskIntoConstraints = false
-        self.workingQueueView.translatesAutoresizingMaskIntoConstraints = false
-        self.queueStackView.translatesAutoresizingMaskIntoConstraints = false
+        self.waitingListTableView.translatesAutoresizingMaskIntoConstraints = false
+        self.workingListTableView.translatesAutoresizingMaskIntoConstraints = false
+        self.listStackView.translatesAutoresizingMaskIntoConstraints = false
         self.containerView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -105,5 +111,36 @@ private extension ViewController {
             self.buttonStackView.heightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05),
             self.timerView.heightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.1),
         ])
+    }
+    
+    private func applyUpdatedWaitingList() {
+        var snapshot = ClientListSnapShot()
+        snapshot.appendSections([.client])
+        let items = [
+            Client(number: 1, task: .deposit),
+            Client(number: 2, task: .loan),
+        ].map(ClientListItem.client)
+        snapshot.appendItems(items, toSection: .client)
+        self.waitingListDataSource.apply(snapshot)
+    }
+    
+    private func applyUpdatedWorkingList() {
+        var snapshot = ClientListSnapShot()
+        snapshot.appendSections([.client])
+        let items = [
+            Client(number: 1, task: .deposit),
+            Client(number: 2, task: .loan),
+        ].map(ClientListItem.client)
+        snapshot.appendItems(items, toSection: .client)
+        self.workingListDataSource.apply(snapshot)
+    }
+}
+
+extension ViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if let tableView = tableView as? ClientListTableView {
+            return tableView.getHeader()
+        }
+        return nil
     }
 }
