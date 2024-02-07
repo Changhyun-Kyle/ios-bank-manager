@@ -112,6 +112,11 @@ final class ViewController: UIViewController {
             UIAction { _ in self.addClient(count: 10) },
             for: .touchUpInside
         )
+        
+        self.clearButton.addAction(
+            UIAction { _ in self.resetBank() },
+            for: .touchUpInside
+        )
     }
     
     private func addClient(count: Int) {
@@ -120,6 +125,10 @@ final class ViewController: UIViewController {
     
     private func runBank() {
         self.bankMirror.startBank()
+    }
+    
+    private func resetBank() {
+        self.bankMirror.resetBank()
     }
 }
 
@@ -167,10 +176,7 @@ private extension ViewController {
 
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if let tableView = tableView as? ClientListTableView {
-            return tableView.getHeader()
-        }
-        return nil
+        return (tableView as? ClientListTableView)?.getHeader()
     }
 }
 

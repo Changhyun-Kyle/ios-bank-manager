@@ -31,8 +31,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         for order in orders {
             let taskManager = TaskManager()
             (1...order.bankerCount).forEach { _ in
-                var banker = Banker()
-                banker.delegate = taskManager
+                var banker = Banker(delegate: taskManager)
                 taskManager.enqueueBanker(banker)
             }
             taskManagers.updateValue(taskManager, forKey: order.taskType)

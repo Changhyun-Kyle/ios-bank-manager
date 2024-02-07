@@ -40,6 +40,7 @@ extension BankManager: BankRunnable {
                     taskManager.startTaskManaging(group: group)
                 }
                 group.wait()
+                self.resetClientCount()
             }
         }
     }
@@ -48,6 +49,7 @@ extension BankManager: BankRunnable {
         for (_, taskManager) in self.taskManagers {
             taskManager.resetTask()
         }
+        resetClientCount()
     }
 }
 
@@ -77,6 +79,10 @@ private extension BankManager {
         let roundedWorkTimeString = String(format: "%.2f", totalWorkTime)
         let output = "업무가 마감되었습니다. 오늘 업무를 처리한 고객은 총 \(numberOfClient)명이며, 총 업무시간은 \(roundedWorkTimeString)초입니다."
 //        self.textOut.display(output: output)
+    }
+    
+    func resetClientCount() {
+        self.currentClientNumber = 0
     }
 }
 
