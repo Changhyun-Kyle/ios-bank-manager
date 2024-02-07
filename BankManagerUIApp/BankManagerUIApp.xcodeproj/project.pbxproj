@@ -33,6 +33,12 @@
 		F44B07CD2B7225890063AE08 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44B07BB2B7225890063AE08 /* TaskManager.swift */; };
 		F44B07CE2B7225890063AE08 /* BankMirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44B07BC2B7225890063AE08 /* BankMirror.swift */; };
 		F44B07D22B7226B30063AE08 /* BankInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44B07D12B7226B30063AE08 /* BankInput.swift */; };
+		F4BC6DFE2B73685E0018D7CB /* BMColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6DFD2B73685E0018D7CB /* BMColor.swift */; };
+		F4BC6E002B73688C0018D7CB /* BankList.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6DFF2B73688C0018D7CB /* BankList.swift */; };
+		F4BC6E022B7368C30018D7CB /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E012B7368C30018D7CB /* TimerView.swift */; };
+		F4BC6E042B7368DB0018D7CB /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E032B7368DB0018D7CB /* ListView.swift */; };
+		F4BC6E062B7369040018D7CB /* ListStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E052B7369040018D7CB /* ListStackView.swift */; };
+		F4BC6E082B73691C0018D7CB /* ListLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC6E072B73691C0018D7CB /* ListLabel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +91,12 @@
 		F44B07BB2B7225890063AE08 /* TaskManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		F44B07BC2B7225890063AE08 /* BankMirror.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BankMirror.swift; sourceTree = "<group>"; };
 		F44B07D12B7226B30063AE08 /* BankInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BankInput.swift; sourceTree = "<group>"; };
+		F4BC6DFD2B73685E0018D7CB /* BMColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BMColor.swift; sourceTree = "<group>"; };
+		F4BC6DFF2B73688C0018D7CB /* BankList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankList.swift; sourceTree = "<group>"; };
+		F4BC6E012B7368C30018D7CB /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		F4BC6E032B7368DB0018D7CB /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
+		F4BC6E052B7369040018D7CB /* ListStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStackView.swift; sourceTree = "<group>"; };
+		F4BC6E072B73691C0018D7CB /* ListLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListLabel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,7 +167,9 @@
 			isa = PBXGroup;
 			children = (
 				2766496E2B7227FE005EB12D /* App */,
-				C7694E3E259C3E9F0053667F /* ViewController.swift */,
+				F4BC6E0B2B736B090018D7CB /* Resource */,
+				F4BC6E0C2B736C2C0018D7CB /* ViewController */,
+				F4BC6E092B7369440018D7CB /* View */,
 				2766496F2B72280B005EB12D /* Supporting */,
 				F44B07A62B7225890063AE08 /* BankManagerModule */,
 			);
@@ -237,6 +251,34 @@
 				F44B07B92B7225890063AE08 /* Client.swift */,
 			);
 			path = Value;
+			sourceTree = "<group>";
+		};
+		F4BC6E092B7369440018D7CB /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F4BC6DFF2B73688C0018D7CB /* BankList.swift */,
+				F4BC6E012B7368C30018D7CB /* TimerView.swift */,
+				F4BC6E032B7368DB0018D7CB /* ListView.swift */,
+				F4BC6E052B7369040018D7CB /* ListStackView.swift */,
+				F4BC6E072B73691C0018D7CB /* ListLabel.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F4BC6E0B2B736B090018D7CB /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				F4BC6DFD2B73685E0018D7CB /* BMColor.swift */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
+		F4BC6E0C2B736C2C0018D7CB /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				C7694E3E259C3E9F0053667F /* ViewController.swift */,
+			);
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -399,11 +441,17 @@
 				C7694E3B259C3E9F0053667F /* AppDelegate.swift in Sources */,
 				F44B07C82B7225890063AE08 /* Banker.swift in Sources */,
 				F44B07CA2B7225890063AE08 /* Order.swift in Sources */,
+				F4BC6E002B73688C0018D7CB /* BankList.swift in Sources */,
+				F4BC6E082B73691C0018D7CB /* ListLabel.swift in Sources */,
+				F4BC6E022B7368C30018D7CB /* TimerView.swift in Sources */,
+				F4BC6DFE2B73685E0018D7CB /* BMColor.swift in Sources */,
 				F44B07C12B7225890063AE08 /* TicketProvidable.swift in Sources */,
 				F44B07CB2B7225890063AE08 /* Client.swift in Sources */,
+				F4BC6E042B7368DB0018D7CB /* ListView.swift in Sources */,
 				F44B07C62B7225890063AE08 /* ClientTaskHandlable.swift in Sources */,
 				F44B07C92B7225890063AE08 /* BankTask.swift in Sources */,
 				C7694E3D259C3E9F0053667F /* SceneDelegate.swift in Sources */,
+				F4BC6E062B7369040018D7CB /* ListStackView.swift in Sources */,
 				F44B07D22B7226B30063AE08 /* BankInput.swift in Sources */,
 				F44B07CC2B7225890063AE08 /* BankManager.swift in Sources */,
 				F44B07C52B7225890063AE08 /* BankerEnqueuable.swift in Sources */,
