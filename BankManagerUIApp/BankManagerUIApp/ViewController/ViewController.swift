@@ -7,6 +7,10 @@
 import UIKit
 
 final class ViewController: UIViewController {
+    // MARK: Properties
+    
+    private let bankMirror: BankInput
+    
     // MARK: UI Elements
     private let addClientButton: UIButton = {
         let button = UIButton(frame: .zero)
@@ -74,17 +78,41 @@ final class ViewController: UIViewController {
     
     private lazy var workingListDataSource = ClientListDataSource(self.workingListTableView)
     
+    // MARK: Initializer
+    
+    init(bankMirror: BankInput) {
+        self.bankMirror = bankMirror
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: Lifecycle Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setLayout()
-        applyUpdatedWaitingList()
-        applyUpdatedWorkingList()
-        
         self.waitingListTableView.delegate = self
         self.workingListTableView.delegate = self
+        setButtonAction()
+        addClient()
+    }
+    
+    private func setButtonAction() {
+        let action = UIAction { _ in self.runBank() }
+        self.startButton.addAction(action, for: .touchUpInside)
+    }
+    
+    private func addClient() {
+        self.bankMirror.addClients(count: 30)
+    }
+    
+    private func runBank() {
+        self.bankMirror.startBank()
     }
 }
 
@@ -113,24 +141,18 @@ private extension ViewController {
         ])
     }
     
-    private func applyUpdatedWaitingList() {
+    private func applyUpdatedWaitingList(with list: [Client]) {
         var snapshot = ClientListSnapShot()
         snapshot.appendSections([.client])
-        let items = [
-            Client(number: 1, task: .deposit),
-            Client(number: 2, task: .loan),
-        ].map(ClientListItem.client)
+        let items = list.map(ClientListItem.client)
         snapshot.appendItems(items, toSection: .client)
         self.waitingListDataSource.apply(snapshot)
     }
     
-    private func applyUpdatedWorkingList() {
+    private func applyUpdatedWorkingList(with list: [Client]) {
         var snapshot = ClientListSnapShot()
         snapshot.appendSections([.client])
-        let items = [
-            Client(number: 1, task: .deposit),
-            Client(number: 2, task: .loan),
-        ].map(ClientListItem.client)
+        let items = list.map(ClientListItem.client)
         snapshot.appendItems(items, toSection: .client)
         self.workingListDataSource.apply(snapshot)
     }
@@ -142,5 +164,19 @@ extension ViewController: UITableViewDelegate {
             return tableView.getHeader()
         }
         return nil
+    }
+}
+
+extension ViewController: BankOutputable {
+    func updateWaitingList(with clients: [Client]) {
+        DispatchQueue.main.async {
+            self.applyUpdatedWaitingList(with: clients)
+        }
+    }
+    
+    func updateWorkingList(with clients: [Client]) {
+        DispatchQueue.main.async {
+            self.applyUpdatedWorkingList(with: clients)
+        }
     }
 }

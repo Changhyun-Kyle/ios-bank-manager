@@ -7,7 +7,7 @@
 import Foundation
 
 final class BankManager {
-    private let textOut: TextOutputDisplayable
+//    private let textOut: TextOutputDisplayable
     
     private var taskManagers: [BankTask: TaskManagable]
     
@@ -16,10 +16,10 @@ final class BankManager {
     private var currentClientNumber: Int
     
     init(
-        textOut: TextOutputDisplayable,
+//        textOut: TextOutputDisplayable,
         taskManagers: [BankTask: TaskManagable] = [:]
     ) {
-        self.textOut = textOut
+//        self.textOut = textOut
         self.taskManagers = taskManagers
         self.currentClientNumber = 0
     }
@@ -51,9 +51,13 @@ private extension BankManager {
     func makeClients(count: Int) {
         let types = self.taskManagers.map { $0.key }
         for number in (currentClientNumber + 1)...(currentClientNumber + count) {
-            guard let type = types.randomElement() else { return }
+            guard let type = types.randomElement() else {
+                return
+            }
             let client = Client(number: number, task: type)
-            guard let taskManager = taskManagers[type] as? ClientEnqueuable else { return }
+            guard let taskManager = taskManagers[type] as? ClientEnqueuable else {
+                return
+            }
             taskManager.enqueueClient(client)
             self.currentClientNumber = number
         }
@@ -68,7 +72,7 @@ private extension BankManager {
     func summarizeDailyStatistics(totalWorkTime: Double, numberOfClient: Int) {
         let roundedWorkTimeString = String(format: "%.2f", totalWorkTime)
         let output = "업무가 마감되었습니다. 오늘 업무를 처리한 고객은 총 \(numberOfClient)명이며, 총 업무시간은 \(roundedWorkTimeString)초입니다."
-        self.textOut.display(output: output)
+//        self.textOut.display(output: output)
     }
 }
 

@@ -16,3 +16,8 @@ protocol BankOutput {
     func didStartWorking(of client: Client)
     func didEndWorking(of client: Client)
 }
+
+protocol BankOutputable: AnyObject {
+    func updateWaitingList(with clients: [Client])
+    func updateWorkingList(with clients: [Client])
+}

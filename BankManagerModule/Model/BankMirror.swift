@@ -10,15 +10,27 @@ import Foundation
 final class BankMirror {
     private let bankManager: BankRunnable
     
-    private var waitingList: [Client]
+    weak var delegate: BankOutputable?
     
-    private var workingList: [Client]
+    private var waitingList: [Client] {
+        didSet {
+            updateWaitingList()
+        }
+    }
+    
+    private var workingList: [Client] {
+        didSet {
+            updateWorkingList()
+        }
+    }
     
     private var waitingSemaphore = DispatchSemaphore(value: 1)
     
     private var workingSemaphore = DispatchSemaphore(value: 1)
     
-    init(bankManager: BankRunnable) {
+    init(
+        bankManager: BankRunnable
+    ) {
         self.waitingList = []
         self.workingList = []
         self.bankManager = bankManager
@@ -94,5 +106,15 @@ extension BankMirror: BankInput {
     
     func addClients(count: Int) {
         self.bankManager.addClients(count: count)
+    }
+}
+
+private extension BankMirror {
+    func updateWaitingList() {
+        self.delegate?.updateWaitingList(with: self.waitingList)
+    }
+    
+    func updateWorkingList() {
+        self.delegate?.updateWorkingList(with: self.workingList)
     }
 }
